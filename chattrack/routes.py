@@ -1,8 +1,7 @@
-from flask import Flask, render_template, url_for, flash, redirect
-from forms import Registration, Login
-
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '89417394d6e0fb06109c676235a8b00b'
+from flask import render_template, url_for, flash, redirect
+from chattrack import app
+from chattrack.forms import Registration, Login
+from chattrack.models import User, Chat
 
 dummyChats = [
     {
@@ -30,16 +29,20 @@ def register():
 @app.route("/login", methods=['GET', 'POST'])
 def login():
     form = Login()
+    if form.validate_on_submit():
+        if form.email.data == "admin@chattrack.com" and form.password.data == "password":
+            flash('You are in!', 'success')
+            return redirect(url_for('home'))
+        else:
+            flash('Login unsuccessful!', 'danger')
+
     return render_template('login.html', title='Login', form=form)
 
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html', template="Home", chats=dummyChats)
+    return render_template('home.html', title="Home", template="Home", chats=dummyChats)
 
 @app.route("/about")
 def about():
-    return render_template('about.html', template="About")
-
-if __name__ == '__main__':
-    app.run(debug=True) # So changes get effect without restarting the app
+    return render_template('about.html', title="About", template="About")
