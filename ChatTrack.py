@@ -1,6 +1,8 @@
-from flask import Flask, render_template, url_for
+from flask import Flask, render_template, url_for, flash, redirect
+from forms import Registration, Login
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = '89417394d6e0fb06109c676235a8b00b'
 
 dummyChats = [
     {
@@ -16,6 +18,19 @@ dummyChats = [
         'date_posted': 'May 2nd, 2023'
     }
 ]
+
+@app.route("/register", methods=['GET', 'POST'])
+def register():
+    form = Registration()
+    if form.validate_on_submit():
+        flash(f'Hello, {form.username.data} - Account created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('register.html', title='Register', form=form)
+
+@app.route("/login", methods=['GET', 'POST'])
+def login():
+    form = Login()
+    return render_template('login.html', title='Login', form=form)
 
 @app.route("/")
 @app.route("/home")
