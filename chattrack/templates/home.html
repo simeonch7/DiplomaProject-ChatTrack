@@ -1,13 +1,19 @@
 {% extends "init_template.html" %}
 {% block content %}
-    {% for chat in chats %}
-    <article class="media content-section">
-        <div class="media-body">
-          <div class="article-metadata">
-            <small class="text-muted"> <a class="article-title" href="#">{{ chat.author }}</a> {{ chat.date_posted }} - <a class="article-title" href="#">{{ chat.channel }}</a> </small>
+  {% if current_user.is_authenticated %}
+      {% for chat in chats %}
+      <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <small class="text-muted"> <a class="article-title" href="#">{{ chat.author }}</a> {{ chat.date_posted }} - <a class="article-title" href="#">{{ chat.channel }}</a> </small>
+            </div>
+            <p class="article-content">{{ chat.content }}</p>
           </div>
-          <p class="article-content">{{ chat.content }}</p>
-        </div>
-      </article>
-    {% endfor %}
+        </article>
+      {% endfor %}
+  {% else %}
+    <div class="alert alert-primary" role="alert">
+      <div class="panel-heading">Please log in!</div>
+    </div>
+  {% endif %}
 {% endblock content %}

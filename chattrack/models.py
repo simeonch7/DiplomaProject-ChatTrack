@@ -1,7 +1,12 @@
-from chattrack import db
+from chattrack import db, login_manager
 from datetime import datetime
+from flask_login import UserMixin # is_authenticated, is_active, is_anonymous, get_id methods
 
-class User(db.Model):
+@login_manager.user_loader # get an id to keep session of the user
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(50), unique=True, nullable=False)
