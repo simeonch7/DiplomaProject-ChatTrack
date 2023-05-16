@@ -21,7 +21,8 @@ class Chat(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     has_alerts = db.Column(db.Boolean, nullable=False, default=False)
     date_uploaded = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    channel = db.Column(db.String(30), nullable=False)
     content = db.Column(db.Text, nullable=False)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     def __repr__(self):
-        return f"Chat('{self.has_alerts}', '{self.date_uploaded}')"
+        return f"Chat('{self.has_alerts}', '{self.date_uploaded}', '{self.channel})"

@@ -3,24 +3,49 @@ import os
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request
 from chattrack import app, db, bcrypt
-from chattrack.forms import Registration, Login, UpdateAccount
+from chattrack.forms import Registration, Login, UpdateAccount, ChatForm
 from chattrack.models import User, Chat
 from flask_login import login_user, current_user, logout_user, login_required
+import re
 
-dummyChats = [
-    {
-        'author': 'Jane Doe',
-        'channel': 'Teams',
-        'content': 'Jane: Hey, how are you? Client: Shut up and help me, lazy!',
-        'date_posted': 'May 2nd, 2023'
-    },
-    {
-        'author': 'Jane Doe',
-        'channel': 'Bloomberg chat',
-        'content': 'Jane: Hey, how can I help you? Client: Are you crazy!?',
-        'date_posted': 'May 2nd, 2023'
-    }
-]
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    f_name, f_ext = os.path.splitext(form_picture.filename)
+    picture_filename = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pictures', picture_filename)
+
+    size = (125, 125)
+    thmb = Image.open(form_picture)
+    thmb.thumbnail(size)
+    thmb.save(picture_path)
+
+    return picture_filename
+
+def find_similarities(content, phrases_file_path):
+    # Load phrases from file
+    with open(phrases_file_path, 'r') as f:
+        phrases = f.readlines()
+
+    # Extract text from SQLAlchemy object
+    text = content
+
+    # Clean up text by removing non-alphanumeric characters and converting to lowercase
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+    print("Checking text > " + text)
+    text = text.lower()
+
+    # Check for similarities
+    for phrase in phrases:
+        # Clean up phrase by removing newlines and converting to lowercase
+        phrase = phrase.strip().lower()
+        print("check for phrase >" + phrase)
+
+        # Check if phrase is in text
+        if phrase in text:
+            print(phrase)
+            return True
+
+    return False
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -32,7 +57,7 @@ def register():
         user = User(username = form.username.data, email = form.email.data, password = hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash(f'Hello, {form.username.data} - Account created!. You are now able to login.', 'success')
+        flash(f'Hello, {form.username.data} - Account created!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -53,29 +78,25 @@ def login():
             flash('Login unsuccessful!', 'danger')
     return render_template('login.html', title='Login', form=form)
 
-@app.route("/logout")
-def logout():
-    logout_user()
-    return redirect(url_for('home'))
-
-
-def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    f_name, f_ext = os.path.splitext(form_picture.filename)
-    picture_filename = random_hex + f_ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pictures', picture_filename)
-
-    size = (125, 125)
-    thmb = Image.open(form_picture)
-    thmb.thumbnail(size)
-    thmb.save(picture_path)
-
-    return picture_filename
-
 @app.route("/chat/new", methods=['GET', 'POST'])
 @login_required
-def new_chat():
-    return render_template('upload_chat.html', title="Upload Chat")
+def upload_chat():
+    form = ChatForm()
+    print("*****")
+    print(form.content.data)
+    print("*****")
+    contents = ""
+    if form.validate_on_submit():
+        contents = str(form.content.data.read().decode('utf-8'))
+        print(">>>>> contents:")
+        print(contents)
+        check_for_alert = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
+        chat = Chat(channel=form.channel.data, content=contents, owner=current_user, has_alerts=check_for_alert)
+        db.session.add(chat)
+        db.session.commit()
+        flash('Your chat has been uploaded!', 'success')
+        return redirect(url_for('home'))
+    return render_template('upload_chat.html', title="Upload Chat", form=form)
 
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
@@ -99,8 +120,14 @@ def account():
 @app.route("/")
 @app.route("/home")
 def home():
-    return render_template('home.html', title="Home", chats=dummyChats)
+    queried_chats = Chat.query.all()
+    return render_template('home.html', title="Home", chats=queried_chats)
 
 @app.route("/about")
 def about():
     return render_template('about.html', title="About")
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home'))

@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField, FileAllowed
+from flask_wtf.file import FileField, FileAllowed, FileRequired
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from chattrack.models import User
 
@@ -46,5 +46,7 @@ class UpdateAccount(FlaskForm):
             if user:
                 raise ValidationError("The email is already in use.")
             
-#class ChatForm(FlaskForm):
-#    title = Strin
+class ChatForm(FlaskForm):
+    channel = StringField('Channel', validators=[DataRequired()])
+    content = FileField('Upload chat', validators=[FileRequired(), FileAllowed(['txt'])])
+    submit_field = SubmitField('Upload Chat')
