@@ -1,0 +1,42 @@
+{% extends "init_template.html" %}
+{% block content %}
+  {% if current_user.is_authenticated %}
+    <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pictures/' + chat.owner.profile_pic) }}">
+        <div class="media-body">
+            <div class="article-metadata">
+                <a class="me-2" href="#">{{ chat.owner.username }}</a>
+                <small class="text-muted">{{ chat.date_uploaded.strftime('%Y-%m-%d') }}</small>
+                {% if chat.owner == current_user %}
+                    <div>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_chat', chat_id = chat.id) }}">Update</a>
+                        <button type="button" class="btn btn-danger btn-sm m-1" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+                    </div>
+                {% endif %}
+            </div>
+            <h5 class="article-title">Channel: {{ chat.channel }}</h5>
+            <p class="article-content">{{ chat.content }}</p>
+        </div>
+        </article>
+        <!-- Modal -->
+        <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">Please confirm that you want to delete the chat.</h5>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form action="{{ url_for('delete_chat', chat_id=chat.id) }}" method="POST">
+                        <input class="btn btn-danger" type="submit" value="Delete">
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+  {% else %}
+    <div class="alert alert-primary" role="alert">
+      <div class="panel-heading">Please log in!</div>
+    </div>
+  {% endif %}
+{% endblock content %}

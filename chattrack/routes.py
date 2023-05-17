@@ -1,7 +1,7 @@
 import secrets
 import os
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request
+from flask import render_template, url_for, flash, redirect, request, abort
 from chattrack import app, db, bcrypt
 from chattrack.forms import Registration, Login, UpdateAccount, ChatForm
 from chattrack.models import User, Chat
@@ -96,7 +96,44 @@ def upload_chat():
         db.session.commit()
         flash('Your chat has been uploaded!', 'success')
         return redirect(url_for('home'))
-    return render_template('upload_chat.html', title="Upload Chat", form=form)
+    return render_template('upload_chat.html', title="Upload Chat",legend="Create chat", form=form)
+
+@app.route("/chat/<int:chat_id>", methods=['GET', 'POST'])
+@login_required
+def chat(chat_id):
+    chat = Chat.query.get_or_404(chat_id)
+    return render_template('chat.html', title=chat.channel, chat=chat)
+
+@app.route("/chat/<int:chat_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_chat(chat_id):
+    chat = Chat.query.get_or_404(chat_id)
+    if chat.owner != current_user:
+        abort(403)
+    form = ChatForm()
+    if form.validate_on_submit():
+        contents = str(form.content.data.read().decode('utf-8'))
+        check_for_alert = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
+        chat.channel = form.channel.data
+        chat.content = contents
+        chat.has_alerts = check_for_alert
+        db.session.commit()
+        flash('Your chat has been updated!', 'success')
+        return redirect(url_for('chat', chat_id = chat.id))
+    elif request.method == 'GET':
+        form.channel.data = chat.channel
+    return render_template('upload_chat.html', title="Update post", legend="Update chat", form=form)
+
+@app.route("/chat/<int:chat_id>/delete", methods=['POST'])
+@login_required
+def delete_chat(chat_id):
+    chat = Chat.query.get_or_404(chat_id)
+    if chat.owner != current_user:
+        abort(403)
+    db.session.delete(chat)
+    db.session.commit()
+    flash('Your chat has been deleted!', 'success')
+    return redirect(url_for('home'))
 
 @app.route("/account", methods=['GET', 'POST'])
 @login_required
@@ -116,7 +153,7 @@ def account():
         form.email.data = current_user.email
     image_file = url_for('static', filename='profile_pictures/' + current_user.profile_pic)
     return render_template('account.html', title="account", image_file = image_file, form = form)
-    
+
 @app.route("/")
 @app.route("/home")
 def home():

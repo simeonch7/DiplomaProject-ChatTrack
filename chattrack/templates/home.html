@@ -2,14 +2,17 @@
 {% block content %}
   {% if current_user.is_authenticated %}
       {% for chat in chats %}
-      <article class="media content-section">
-          <div class="media-body">
-            <div class="article-metadata">
-              <small class="text-muted"> <a class="article-title" href="#">{{ chat.owner }}</a> {{ chat.date_posted }} - <a class="article-title" href="#">{{ chat.channel }}</a> </small>
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pictures/' + chat.owner.profile_pic) }}">
+            <div class="media-body">
+              <div class="article-metadata">
+                <a class="me-2" href="#">{{ chat.owner.username }}</a>
+                <small class="text-muted">{{ chat.date_uploaded.strftime('%Y-%m-%d') }}</small>
+              </div>
+              <h5><a class="article-title" href="{{ url_for('chat', chat_id=chat.id)}}">Channel: {{ chat.channel }}</a></h5>
+              <p class="article-content">{{ chat.content }}</p>
             </div>
-            <p class="article-content">{{ chat.content }}</p>
-          </div>
-        </article>
+          </article>
       {% endfor %}
   {% else %}
     <div class="alert alert-primary" role="alert">
