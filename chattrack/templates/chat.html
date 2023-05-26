@@ -2,10 +2,10 @@
 {% block content %}
   {% if current_user.is_authenticated %}
     <article class="media content-section">
-        <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pictures/' + chat.owner.profile_pic) }}">
         <div class="media-body">
             <div class="article-metadata">
-                <a class="me-2" href="#">{{ chat.owner.username }}</a>
+                <img class="rounded-circle article-img" src="{{ url_for('static', filename='profile_pictures/' + chat.owner.profile_pic) }}">
+                <a class="username me-2" href="{{ url_for('user_chats', username=chat.owner.username) }}">{{ chat.owner.username }}</a>
                 <small class="text-muted">{{ chat.date_uploaded.strftime('%Y-%m-%d') }}</small>
                 {% if chat.owner == current_user %}
                     <div>
@@ -18,6 +18,15 @@
             <p class="article-content">{{ chat.content }}</p>
         </div>
         </article>
+        {% if chat.has_alerts == true %}
+            <div class="alert alert-danger" role="alert">
+                <div class="panel-heading">Alerts found! Please review the chat.</div>
+            </div>
+        {% else %}
+            <div class="alert alert-success" role="alert">
+                <div class="panel-heading">No alerts found.</div>
+            </div>
+        {% endif %}
         <!-- Modal -->
         <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
             <div class="modal-dialog" role="document">

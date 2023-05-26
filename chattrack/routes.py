@@ -142,7 +142,7 @@ def account():
     if form.validate_on_submit():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
-        current_user.profile_pic = picture_file
+            current_user.profile_pic = picture_file
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
@@ -157,7 +157,8 @@ def account():
 @app.route("/")
 @app.route("/home")
 def home():
-    queried_chats = Chat.query.all()
+    page = request.args.get('page', 1, type=int)
+    queried_chats = Chat.query.order_by(Chat.date_uploaded.desc()).paginate(page=page, per_page=3)
     return render_template('home.html', title="Home", chats=queried_chats)
 
 @app.route("/about")
@@ -168,3 +169,10 @@ def about():
 def logout():
     logout_user()
     return redirect(url_for('home'))
+
+@app.route("/user/<string:username>")
+def user_chats(username):
+    page = request.args.get('page', 1, type=int)
+    user = User.query.filter_by(username=username).first_or_404()
+    queried_chats = Chat.query.filter_by(owner=user).order_by(Chat.date_uploaded.desc()).paginate(page=page, per_page=3)
+    return render_template('user_chats.html', title="Home", chats=queried_chats, user=user)
