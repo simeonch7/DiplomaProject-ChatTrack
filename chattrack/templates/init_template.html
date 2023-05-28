@@ -57,9 +57,44 @@
                 </div>
               <div class="col-md-4">
                 <div class="content-section">
-                  <p>Test</p>
-                </div>
+                  <div id="clock">
+                    <script>
+                        function updateClock() {
+                            var offset = 3; // UTC+3
+                            var currentTime = new Date();
+                            var currentUTCTime = new Date(currentTime.getTime() + (currentTime.getTimezoneOffset() * 60000));
+                            var currentLocalTime = new Date(currentUTCTime.getTime() + (offset * 60 * 60000));
+                
+                            var hours = currentLocalTime.getUTCHours();
+                            var minutes = currentLocalTime.getUTCMinutes();
+                            var seconds = currentLocalTime.getUTCSeconds();
+                
+                            hours = (hours < 10) ? "0" + hours : hours;
+                            minutes = (minutes < 10) ? "0" + minutes : minutes;
+                            seconds = (seconds < 10) ? "0" + seconds : seconds;
+                
+                            var clockDiv = document.getElementById("clock");
+                            clockDiv.textContent = hours + ":" + minutes + ":" + seconds;
+                
+                            setTimeout(updateClock, 1000);
+                        }
+                        updateClock();
+                    </script>
+                  </div>
               </div>
+                {% if users and current_user.is_authenticated%}
+                <h4>Filter chats by user:</h4>
+                <div class="content-section">
+                  {% for user in users %}
+                    <a class="username me-2" href="{{ url_for('user_chats', username=user.username) }}">{{ user.username }}</a><br>
+                  {% endfor %}
+                </div>
+              <h4>Filter chats by:</h4>
+              <div class="content-section">
+                  <a class="username me-2" href="{{ url_for('alerted_chats', alerted='true') }}">Alerted chats</a><br>
+                  <a class="username me-2" href="{{ url_for('alerted_chats', alerted='false') }}">Non-alerted chats</a><br>
+              </div>
+              {% endif %}
             </div>
           </main>
         </header>

@@ -4,6 +4,12 @@
     margin-top: 5rem;
   }
   
+  #clock {
+    font-family: "Times New Roman", Times, serif;
+    font-size: 26px;
+    text-align: left;
+}
+
   h1, h2, h3, h4, h5, h6 {
     color: #9DB2BF;
   }
@@ -50,7 +56,7 @@
   }
   
   a.username:hover {
-    color: #0000d5;
+    color: #4E4E6A;
     text-decoration: none;
   }
 

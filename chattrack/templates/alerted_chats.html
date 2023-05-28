@@ -1,5 +1,6 @@
 {% extends "init_template.html" %}
 {% block content %}
+<h4 class="mb-3"> Total filtered chats: ({{ chats.total }})</h4>
   {% if current_user.is_authenticated %}
       {% for chat in chats.items %}
         <article class="media content-section">
@@ -16,10 +17,10 @@
       {% endfor %}
       {% for page_num in chats.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
         {% if page_num %}
-          {% if chats.page ==page_num %}
-            <a class="btn btn-warning mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+          {% if chats.page == page_num %}
+            <a class="btn btn-warning mb-4" href="{{ url_for('alerted_chats', page=page_num, alerted=alerted) }}">{{ page_num }}</a>
           {% else %}
-            <a class="btn btn-outline-warning mb-4" href="{{ url_for('home', page=page_num) }}">{{ page_num }}</a>
+            <a class="btn btn-outline-warning mb-4" href="{{ url_for('alerted_chats', page=page_num, alerted=alerted) }}">{{ page_num }}</a>
           {% endif %}
         {% else %}
           ...

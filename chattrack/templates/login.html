@@ -41,14 +41,12 @@
             <div class="form-group mt-4 mb-4">
                 {{ form.submit_field(class="btn btn-outline-success") }}
             </div>
-            <small class="text-muted">
-                <a href="#">Reset password</a>
-            </small>
+            <small><a class="username" href="#">Reset password</a></small>
         </form>
     </div>
     <div class="border-top pt-3">
-        <small class="text-muted">
-            Missing an account? <a class="ml-2" href="{{ url_for('register') }}">Register here</a>
+        <small class="username">
+            Missing an account? <a class="ml-2 username" href="{{ url_for('register') }}">Register here</a>
         </small>
     </div>
 {% endblock content %}

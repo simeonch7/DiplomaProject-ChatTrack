@@ -159,7 +159,8 @@ def account():
 def home():
     page = request.args.get('page', 1, type=int)
     queried_chats = Chat.query.order_by(Chat.date_uploaded.desc()).paginate(page=page, per_page=3)
-    return render_template('home.html', title="Home", chats=queried_chats)
+    all_users = User.query.all()
+    return render_template('home.html', title="Home", chats=queried_chats, users=all_users)
 
 @app.route("/about")
 def about():
@@ -173,6 +174,18 @@ def logout():
 @app.route("/user/<string:username>")
 def user_chats(username):
     page = request.args.get('page', 1, type=int)
+    all_users = User.query.all()
     user = User.query.filter_by(username=username).first_or_404()
     queried_chats = Chat.query.filter_by(owner=user).order_by(Chat.date_uploaded.desc()).paginate(page=page, per_page=3)
-    return render_template('user_chats.html', title="Home", chats=queried_chats, user=user)
+    return render_template('user_chats.html', title="Home", chats=queried_chats, user=user, users=all_users)
+
+@app.route("/alerted/<string:alerted>")
+def alerted_chats(alerted):
+    if alerted == 'true':
+        has_alerts = True
+    elif alerted == 'false':
+        has_alerts = False
+    page = request.args.get('page', 1, type=int)
+    all_users = User.query.all()
+    queried_chats = Chat.query.filter_by(has_alerts=has_alerts).order_by(Chat.date_uploaded.desc()).paginate(page=page, per_page=3)
+    return render_template('alerted_chats.html', title="Home", chats=queried_chats, users=all_users, alerted=alerted)
