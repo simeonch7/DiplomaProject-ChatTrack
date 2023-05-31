@@ -74,7 +74,7 @@ def find_similarities(content, phrases_file_path):
         data.extend(phrases)
         tfidf_matrix = vectorizer.fit_transform(data)
 
-        def get_related_phrases(phrase, threshold=0.3):
+        def get_related_phrases(phrase, threshold=0.6):
             tokens = word_tokenize(phrase.lower())
             query_vec = vectorizer.transform([' '.join(tokens)])
             similarity_scores = cosine_similarity(tfidf_matrix, query_vec).flatten()
@@ -89,8 +89,8 @@ def find_similarities(content, phrases_file_path):
     
     get_related_phrases = train_bribe_ai(initial_phrases)
 
-    related_phrases = get_related_phrases(text)
-
+    related_phrases = get_related_phrases("Related phrases: " + text)
+    print(related_phrases)
     if related_phrases:
         return True
     
