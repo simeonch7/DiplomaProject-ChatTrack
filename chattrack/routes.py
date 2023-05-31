@@ -7,6 +7,11 @@ from chattrack.forms import Registration, Login, UpdateAccount, ChatForm
 from chattrack.models import User, Chat
 from flask_login import login_user, current_user, logout_user, login_required
 import re
+import nltk
+from nltk.corpus import wordnet
+from nltk.tokenize import word_tokenize
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
 
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
@@ -21,10 +26,37 @@ def save_picture(form_picture):
 
     return picture_filename
 
+# def find_similarities(content, phrases_file_path):
+#     # Load phrases from file
+#     with open(phrases_file_path, 'r') as f:
+#         phrases = f.readlines()
+
+#     # Extract text from SQLAlchemy object
+#     text = content
+
+#     # Clean up text by removing non-alphanumeric characters and converting to lowercase
+#     text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+#     print("Checking text > " + text)
+#     text = text.lower()
+
+#     # Check for similarities
+#     for phrase in phrases:
+#         # Clean up phrase by removing newlines and converting to lowercase
+#         phrase = phrase.strip().lower()
+#         print("check for phrase >" + phrase)
+
+#         # Check if phrase is in text
+#         if phrase in text:
+#             print(phrase)
+#             return True
+
+#     return False
+
 def find_similarities(content, phrases_file_path):
+    nltk.download('punkt')
     # Load phrases from file
     with open(phrases_file_path, 'r') as f:
-        phrases = f.readlines()
+        initial_phrases = f.readlines()
 
     # Extract text from SQLAlchemy object
     text = content
@@ -34,17 +66,34 @@ def find_similarities(content, phrases_file_path):
     print("Checking text > " + text)
     text = text.lower()
 
-    # Check for similarities
-    for phrase in phrases:
-        # Clean up phrase by removing newlines and converting to lowercase
-        phrase = phrase.strip().lower()
-        print("check for phrase >" + phrase)
+    def train_bribe_ai(phrases):
+        data = []
+        vectorizer = TfidfVectorizer()
+        tfidf_matrix = None
 
-        # Check if phrase is in text
-        if phrase in text:
-            print(phrase)
-            return True
+        data.extend(phrases)
+        tfidf_matrix = vectorizer.fit_transform(data)
 
+        def get_related_phrases(phrase, threshold=0.3):
+            tokens = word_tokenize(phrase.lower())
+            query_vec = vectorizer.transform([' '.join(tokens)])
+            similarity_scores = cosine_similarity(tfidf_matrix, query_vec).flatten()
+            related_indices = similarity_scores.argsort()[::-1]
+            related_phrases = []
+            for index in related_indices:
+                if similarity_scores[index] > threshold:
+                    related_phrases.append(data[index])
+            return related_phrases
+
+        return get_related_phrases
+    
+    get_related_phrases = train_bribe_ai(initial_phrases)
+
+    related_phrases = get_related_phrases(text)
+
+    if related_phrases:
+        return True
+    
     return False
 
 @app.route("/register", methods=['GET', 'POST'])
