@@ -15,17 +15,19 @@
             </div>
           </article>
       {% endfor %}
-      {% for page_num in chats.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-        {% if page_num %}
-          {% if chats.page == page_num %}
-            <a class="btn btn-warning mb-4" href="{{ url_for('alerted_chats', page=page_num, alerted=alerted) }}">{{ page_num }}</a>
+      <div class="float-end">
+        {% for page_num in chats.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+          {% if page_num %}
+            {% if chats.page == page_num %}
+              <a class="btn btn-warning mb-4" href="{{ url_for('alerted_chats', page=page_num, alerted=alerted) }}">{{ page_num }}</a>
+            {% else %}
+              <a class="btn btn-outline-warning mb-4" href="{{ url_for('alerted_chats', page=page_num, alerted=alerted) }}">{{ page_num }}</a>
+            {% endif %}
           {% else %}
-            <a class="btn btn-outline-warning mb-4" href="{{ url_for('alerted_chats', page=page_num, alerted=alerted) }}">{{ page_num }}</a>
+            ...
           {% endif %}
-        {% else %}
-          ...
-        {% endif %}
-      {% endfor %}
+        {% endfor %}
+        </div>
   {% else %}
     <div class="alert alert-primary" role="alert">
       <div class="panel-heading">Please log in!</div>
