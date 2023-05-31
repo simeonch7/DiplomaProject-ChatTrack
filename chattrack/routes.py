@@ -8,7 +8,6 @@ from chattrack.models import User, Chat
 from flask_login import login_user, current_user, logout_user, login_required
 import re
 import nltk
-from nltk.corpus import wordnet
 from nltk.tokenize import word_tokenize
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
