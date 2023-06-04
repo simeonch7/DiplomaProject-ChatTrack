@@ -53,17 +53,12 @@ def save_picture(form_picture):
 
 def find_similarities(content, phrases_file_path):
     nltk.download('punkt')
-    # Load phrases from file
+    
     with open(phrases_file_path, 'r') as f:
         initial_phrases = f.readlines()
 
-    # Extract text from SQLAlchemy object
-    text = content
-
-    # Clean up text by removing non-alphanumeric characters and converting to lowercase
-    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-    print("Checking text > " + text)
-    text = text.lower()
+    content = re.sub(r'[^a-zA-Z0-9\s]', '', content) # Clean up text by removing non-alphanumeric characters and converting to lowercase
+    content = content.lower()
 
     def train_bribe_ai(phrases):
         data = []
@@ -73,10 +68,10 @@ def find_similarities(content, phrases_file_path):
         data.extend(phrases)
         tfidf_matrix = vectorizer.fit_transform(data)
 
-        def get_related_phrases(phrase, threshold=0.6):
-            tokens = word_tokenize(phrase.lower())
-            query_vec = vectorizer.transform([' '.join(tokens)])
-            similarity_scores = cosine_similarity(tfidf_matrix, query_vec).flatten()
+        def get_related_phrases(chat, threshold=0.6):
+            tokens = word_tokenize(chat.lower())
+            query_vectors = vectorizer.transform([' '.join(tokens)])
+            similarity_scores = cosine_similarity(tfidf_matrix, query_vectors).flatten()
             related_indices = similarity_scores.argsort()[::-1]
             related_phrases = []
             for index in related_indices:
@@ -84,12 +79,12 @@ def find_similarities(content, phrases_file_path):
                     related_phrases.append(data[index])
             return related_phrases
 
-        return get_related_phrases
-    
-    get_related_phrases = train_bribe_ai(initial_phrases)
+        return get_related_phrases  #returns the get_related_phrases function as a closure. By returning the inner function, 
+                                    #we can encapsulate the trained data and vectorizer within the returned function
+                                    #allowing us to use them for subsequent calls to get_related_phrases
 
-    related_phrases = get_related_phrases("Related phrases: " + text)
-    print(related_phrases)
+    get_related_phrases = train_bribe_ai(initial_phrases) # initialization of the function iteslef
+    related_phrases = get_related_phrases(content)        # utilization of the function^
     if related_phrases:
         return True
     
