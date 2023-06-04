@@ -25,32 +25,6 @@ def save_picture(form_picture):
 
     return picture_filename # write to db
 
-# def find_similarities(content, phrases_file_path):
-#     # Load phrases from file
-#     with open(phrases_file_path, 'r') as f:
-#         phrases = f.readlines()
-
-#     # Extract text from SQLAlchemy object
-#     text = content
-
-#     # Clean up text by removing non-alphanumeric characters and converting to lowercase
-#     text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
-#     print("Checking text > " + text)
-#     text = text.lower()
-
-#     # Check for similarities
-#     for phrase in phrases:
-#         # Clean up phrase by removing newlines and converting to lowercase
-#         phrase = phrase.strip().lower()
-#         print("check for phrase >" + phrase)
-
-#         # Check if phrase is in text
-#         if phrase in text:
-#             print(phrase)
-#             return True
-
-#     return False
-
 def find_similarities(content, phrases_file_path):
     nltk.download('punkt')
     
@@ -125,14 +99,9 @@ def login():
 @login_required
 def upload_chat():
     form = ChatForm()
-    print("*****")
-    print(form.content.data)
-    print("*****")
     contents = ""
     if form.validate_on_submit():
         contents = str(form.content.data.read().decode('utf-8'))
-        print(">>>>> contents:")
-        print(contents)
         check_for_alert = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
         chat = Chat(channel=form.channel.data, content=contents, owner=current_user, has_alerts=check_for_alert)
         db.session.add(chat)
