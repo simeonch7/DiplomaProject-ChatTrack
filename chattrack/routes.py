@@ -13,17 +13,17 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def save_picture(form_picture):
-    random_hex = secrets.token_hex(8)
-    f_name, f_ext = os.path.splitext(form_picture.filename)
-    picture_filename = random_hex + f_ext
+    random_name = secrets.token_hex(8)
+    f_name, f_extension = os.path.splitext(form_picture.filename)
+    picture_filename = random_name + f_extension
     picture_path = os.path.join(app.root_path, 'static/profile_pictures', picture_filename)
 
     size = (125, 125)
-    thmb = Image.open(form_picture)
-    thmb.thumbnail(size)
-    thmb.save(picture_path)
+    thumbnail = Image.open(form_picture)
+    thumbnail.thumbnail(size)
+    thumbnail.save(picture_path)
 
-    return picture_filename
+    return picture_filename # write to db
 
 # def find_similarities(content, phrases_file_path):
 #     # Load phrases from file
