@@ -3,20 +3,16 @@
     color: #333333;
     margin-top: 5rem;
   }
+
+  h4, h5{
+    color: #9DB2BF;
+  }
   
   #clock {
     font-family: "Times New Roman", Times, serif;
     font-size: 26px;
     text-align: left;
 }
-
-  h1, h2, h3, h4, h5, h6 {
-    color: #9DB2BF;
-  }
-  
-  .bg-steel {
-    background-color: #5f788a;
-  }
   
   .site-header .navbar-nav .nav-link {
     color: #9DB2BF;
@@ -36,7 +32,7 @@
   .content-section {
     background: #9DB2BF;
     padding: 10px 20px;
-    border-radius: 10px;
+    border-radius: 5px;
     margin-bottom: 20px;
   }
   
@@ -71,9 +67,8 @@
   }
   
   .article-metadata {
-    padding-bottom: 1px;
     margin-bottom: 4px;
-    border-bottom: 1px solid #e3e3e3
+    border-bottom: 2px solid #e3e3e3
   }
   
   .article-metadata a:hover {
@@ -81,19 +76,9 @@
     text-decoration: none;
   }
   
-  .article-svg {
-    width: 25px;
-    height: 25px;
-    vertical-align: middle;
-  }
-  
   .account-img {
     height: 100px;
     width: 100px;
     margin-right: 20px;
     margin-bottom: 16px;
-  }
-  
-  .account-heading {
-    font-size: 2.5rem;
   }
