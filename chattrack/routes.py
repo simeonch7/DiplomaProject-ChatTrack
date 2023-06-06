@@ -25,7 +25,7 @@ def save_picture(form_picture):
     thumbnail.thumbnail(size)
     thumbnail.save(picture_path)
 
-    return picture_filename # write to db
+    return picture_filename # to write to db
 
 def find_similarities(content, phrases_file_path):
     nltk.download('punkt')
@@ -33,7 +33,7 @@ def find_similarities(content, phrases_file_path):
     with open(phrases_file_path, 'r') as f:
         initial_phrases = f.readlines()
 
-    content = re.sub(r'[^a-zA-Z0-9\s]', '', content) # Clean up text by removing non-alphanumeric characters and converting to lowercase
+    content = re.sub(r'[^a-zA-Z0-9\s]', '', content) # Clean up text
     content = content.translate(str.maketrans('', '', string.punctuation))
     content = content.lower()
 
@@ -62,7 +62,7 @@ def find_similarities(content, phrases_file_path):
                                     #we can encapsulate the trained data and vectorizer within the returned function
                                     #allowing us to use them for subsequent calls to get_related_phrases
 
-    get_related_phrases = train_bribe_ai(initial_phrases) # initialization of the function iteslef
+    get_related_phrases = train_bribe_ai(initial_phrases) # initialization of the function itself
     related_phrases = get_related_phrases(content)        # utilization of the function^
     return related_phrases
 
@@ -110,7 +110,8 @@ def upload_chat():
         else:
             check_for_alert = False
         serialized_suspicious_phrases=json.dumps(suspicious_phrases)
-        chat = Chat(channel=form.channel.data, content=contents, owner=current_user, similar_phrases_found=serialized_suspicious_phrases, has_alerts=check_for_alert)
+        chat = Chat(channel=form.channel.data, content=contents, owner=current_user, 
+                    similar_phrases_found=serialized_suspicious_phrases, has_alerts=check_for_alert)
         print("Suspicious Phrases:")
         print(suspicious_phrases)
         db.session.add(chat)
