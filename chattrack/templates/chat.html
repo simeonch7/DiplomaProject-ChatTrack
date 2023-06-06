@@ -20,7 +20,11 @@
         </article>
         {% if chat.has_alerts == true %}
             <div class="alert alert-danger" role="alert">
-                <div class="panel-heading">Alerts found! Please review the chat.</div>
+                <div class="panel-heading">Alerts found! Look out for the following phrases:</div>
+                <hr class="bg-danger border-2 border-top border-danger">
+                {% for phrase in phrases_found %}
+                    <div class="font-weight-bold fw-bolder">{{ phrase }}</div>           
+                {% endfor %}
             </div>
         {% else %}
             <div class="alert alert-success" role="alert">

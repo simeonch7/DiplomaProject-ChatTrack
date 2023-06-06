@@ -1,5 +1,7 @@
 import secrets
 import os
+import json
+import string
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from chattrack import app, db, bcrypt
@@ -32,6 +34,7 @@ def find_similarities(content, phrases_file_path):
         initial_phrases = f.readlines()
 
     content = re.sub(r'[^a-zA-Z0-9\s]', '', content) # Clean up text by removing non-alphanumeric characters and converting to lowercase
+    content = content.translate(str.maketrans('', '', string.punctuation))
     content = content.lower()
 
     def train_bribe_ai(phrases):
@@ -42,8 +45,10 @@ def find_similarities(content, phrases_file_path):
         data.extend(phrases)
         tfidf_matrix = vectorizer.fit_transform(data)
 
-        def get_related_phrases(chat, threshold=0.6):
+        def get_related_phrases(chat, threshold=0.3):
             tokens = word_tokenize(chat.lower())
+            print("TOKENS:::")
+            print(tokens)
             query_vectors = vectorizer.transform([' '.join(tokens)])
             similarity_scores = cosine_similarity(tfidf_matrix, query_vectors).flatten()
             related_indices = similarity_scores.argsort()[::-1]
@@ -59,10 +64,7 @@ def find_similarities(content, phrases_file_path):
 
     get_related_phrases = train_bribe_ai(initial_phrases) # initialization of the function iteslef
     related_phrases = get_related_phrases(content)        # utilization of the function^
-    if related_phrases:
-        return True
-    
-    return False
+    return related_phrases
 
 @app.route("/register", methods=['GET', 'POST'])
 def register():
@@ -102,8 +104,15 @@ def upload_chat():
     contents = ""
     if form.validate_on_submit():
         contents = str(form.content.data.read().decode('utf-8'))
-        check_for_alert = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
-        chat = Chat(channel=form.channel.data, content=contents, owner=current_user, has_alerts=check_for_alert)
+        suspicious_phrases = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
+        if suspicious_phrases:
+            check_for_alert = True
+        else:
+            check_for_alert = False
+        serialized_suspicious_phrases=json.dumps(suspicious_phrases)
+        chat = Chat(channel=form.channel.data, content=contents, owner=current_user, similar_phrases_found=serialized_suspicious_phrases, has_alerts=check_for_alert)
+        print("Suspicious Phrases:")
+        print(suspicious_phrases)
         db.session.add(chat)
         db.session.commit()
         flash('Your chat has been uploaded!', 'success')
@@ -114,7 +123,8 @@ def upload_chat():
 @login_required
 def chat(chat_id):
     chat = Chat.query.get_or_404(chat_id)
-    return render_template('chat.html', title=chat.channel, chat=chat)
+    deserialized_similar_phrases_found = json.loads(chat.similar_phrases_found)
+    return render_template('chat.html', title=chat.channel, chat=chat, phrases_found=deserialized_similar_phrases_found)
 
 @app.route("/chat/<int:chat_id>/update", methods=['GET', 'POST'])
 @login_required
@@ -125,10 +135,18 @@ def update_chat(chat_id):
     form = ChatForm()
     if form.validate_on_submit():
         contents = str(form.content.data.read().decode('utf-8'))
-        check_for_alert = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
+        suspicious_phrases = find_similarities(contents, 'chattrack/models/inappropriate_behaviour.txt')
+        if suspicious_phrases:
+            check_for_alert = True
+        else:
+            check_for_alert = False
+        serialized_suspicious_phrases=json.dumps(suspicious_phrases)
+        print("Suspicious Phrases:")
+        print(suspicious_phrases)
         chat.channel = form.channel.data
         chat.content = contents
         chat.has_alerts = check_for_alert
+        chat.similar_phrases_found = serialized_suspicious_phrases
         db.session.commit()
         flash('Your chat has been updated!', 'success')
         return redirect(url_for('chat', chat_id = chat.id))
