@@ -4,7 +4,7 @@
         <form method="POST" action="">
             {{ form.hidden_tag() }}
             <fieldset class="form-group">
-                <legend class="border-bottom mb-4">Registration form</legend>
+                <legend class="border-bottom mb-4">Регистрация</legend>
                 <div class="form-group">
                     {{ form.username.label(class="form-control-label") }}
 
@@ -69,7 +69,7 @@
     </div>
     <div class="border-top pt-3">
         <small class="username">
-            Already have an account? <a class="ml-2 username" href="{{ url_for('login') }}">Sign in</a>
+            Имаш профил? <a class="ml-2 username" href="{{ url_for('login') }}">Влез.</a>
         </small>
     </div>
 {% endblock content %}

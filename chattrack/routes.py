@@ -15,12 +15,12 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
 def save_picture(form_picture):
-    random_name = secrets.token_hex(8)
-    f_name, f_extension = os.path.splitext(form_picture.filename)
-    picture_filename = random_name + f_extension
+    random_name = secrets.token_hex(5)
+    extension = os.path.splitext(form_picture.filename)[1]
+    picture_filename = random_name + extension
     picture_path = os.path.join(app.root_path, 'static/profile_pictures', picture_filename)
 
-    size = (125, 125)
+    size = (100, 100)
     thumbnail = Image.open(form_picture)
     thumbnail.thumbnail(size)
     thumbnail.save(picture_path)
@@ -76,7 +76,7 @@ def register():
         user = User(username = form.username.data, email = form.email.data, password = hashed_password)
         db.session.add(user)
         db.session.commit()
-        flash(f'Hello, {form.username.data} - Account created!', 'success')
+        flash(f'Здравейте, {form.username.data} - успешно създадохте акаунт!', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
@@ -94,7 +94,7 @@ def login():
             else:    
                 return redirect(url_for('home'))
         else:
-            flash('Login unsuccessful!', 'danger')
+            flash('Грешен имейл или парола!', 'danger')
     return render_template('login.html', title='Login', form=form)
 
 @app.route("/chat/new", methods=['GET', 'POST'])
@@ -116,9 +116,9 @@ def upload_chat():
         print(suspicious_phrases)
         db.session.add(chat)
         db.session.commit()
-        flash('Your chat has been uploaded!', 'success')
+        flash('Успешно качен файл!', 'success')
         return redirect(url_for('home'))
-    return render_template('upload_chat.html', title="Upload Chat",legend="Create chat", form=form)
+    return render_template('upload_chat.html', title="Upload Chat",legend="Добавете нов файл за сканиране", form=form)
 
 @app.route("/chat/<int:chat_id>", methods=['GET', 'POST'])
 @login_required
@@ -149,11 +149,11 @@ def update_chat(chat_id):
         chat.has_alerts = check_for_alert
         chat.similar_phrases_found = serialized_suspicious_phrases
         db.session.commit()
-        flash('Your chat has been updated!', 'success')
+        flash('Успешно обновен чат!', 'success')
         return redirect(url_for('chat', chat_id = chat.id))
     elif request.method == 'GET':
         form.channel.data = chat.channel
-    return render_template('upload_chat.html', title="Update post", legend="Update chat", form=form)
+    return render_template('upload_chat.html', title="Update post", legend="Обновете съществуващ чат", form=form)
 
 @app.route("/chat/<int:chat_id>/delete", methods=['POST'])
 @login_required
@@ -163,7 +163,7 @@ def delete_chat(chat_id):
         abort(403)
     db.session.delete(chat)
     db.session.commit()
-    flash('Your chat has been deleted!', 'success')
+    flash('Успешно изтрит чат!', 'success')
     return redirect(url_for('home'))
 
 @app.route("/account", methods=['GET', 'POST'])
@@ -177,7 +177,7 @@ def account():
         current_user.username = form.username.data
         current_user.email = form.email.data
         db.session.commit()
-        flash('your account has been updated!', 'success')
+        flash('Успешно обновихте акаунта си!', 'success')
         return redirect(url_for('account'))
     elif request.method == 'GET':
         form.username.data = current_user.username

@@ -24,15 +24,15 @@
                 </button>
                 <div class="collapse navbar-collapse" id="navbarToggle">
                   <div class="navbar-nav ms-auto">
-                    <a class="nav-item nav-link" href="{{ url_for('home') }}">Home</a>
-                    <a class="nav-item nav-link" href="{{ url_for('about') }}">About</a>
+                    <a class="nav-item nav-link" href="{{ url_for('home') }}">Начална страница</a>
+                    <a class="nav-item nav-link" href="{{ url_for('about') }}">За нас</a>
                     {% if current_user.is_authenticated %}
-                    <a class="nav-item nav-link" href="{{ url_for('upload_chat') }}">Upload chat</a>
-                    <a class="nav-item nav-link" href="{{ url_for('account') }}">Account</a>
-                    <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a>
+                    <a class="nav-item nav-link" href="{{ url_for('upload_chat') }}">Добави файл</a>
+                    <a class="nav-item nav-link" href="{{ url_for('account') }}">Профил</a>
+                    <a class="nav-item nav-link" href="{{ url_for('logout') }}">Изход</a>
                     {% else %}
-                      <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a>
-                      <a class="nav-item nav-link" href="{{ url_for('register') }}">Register</a>
+                      <a class="nav-item nav-link" href="{{ url_for('login') }}">Вход</a>
+                      <a class="nav-item nav-link" href="{{ url_for('register') }}">Регистрирай се</a>
                     {% endif %}
                   </div>
                 </div>
@@ -69,16 +69,16 @@
                   </div>
               </div>
                 {% if users and current_user.is_authenticated%}
-                <h4>Filter chats by user:</h4>
+                <h5>Преглед спрямо собственик:</h5>
                 <div class="content-section">
                   {% for user in users %}
                     <a class="username me-2" href="{{ url_for('user_chats', username=user.username) }}">{{ user.username }}</a><br>
                   {% endfor %}
                 </div>
-              <h4>Filter chats by:</h4>
+              <h5>Преглед на файловете:</h5>
               <div class="content-section">
-                  <a class="username me-2" href="{{ url_for('alerted_chats', alerted='true') }}">Alerted chats</a><br>
-                  <a class="username me-2" href="{{ url_for('alerted_chats', alerted='false') }}">Non-alerted chats</a><br>
+                  <a class="username me-2" href="{{ url_for('alerted_chats', alerted='true') }}">С предупреждения</a><br>
+                  <a class="username me-2" href="{{ url_for('alerted_chats', alerted='false') }}">Без предупреждения</a><br>
               </div>
               {% endif %}
             </div>

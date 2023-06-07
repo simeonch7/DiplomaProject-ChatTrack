@@ -9,18 +9,18 @@
                 <small class="text-muted">{{ chat.date_uploaded.strftime('%Y-%m-%d') }}</small>
                 {% if chat.owner == current_user %}
                     <div>
-                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_chat', chat_id = chat.id) }}">Update</a>
-                        <button type="button" class="btn btn-danger btn-sm m-1" data-bs-toggle="modal" data-bs-target="#deleteModal">Delete</button>
+                        <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_chat', chat_id = chat.id) }}">Обнови записа</a>
+                        <button type="button" class="btn btn-danger btn-sm m-1" data-bs-toggle="modal" data-bs-target="#deleteModal">Изтрий записа</button>
                     </div>
                 {% endif %}
             </div>
-            <h5 class="article-title">Channel: {{ chat.channel }}</h5>
+            <h5 class="article-title">Комуникационен канал: {{ chat.channel }}</h5>
             <p class="article-content">{{ chat.content }}</p>
         </div>
         </article>
         {% if chat.has_alerts == true %}
             <div class="alert alert-danger" role="alert">
-                <div class="panel-heading">Alerts found! Look out for the following phrases:</div>
+                <div class="panel-heading">Подозрително съдържание! Моля прегледайте чата за следните изрази:</div>
                 <hr class="bg-danger border-2 border-top border-danger">
                 {% for phrase in phrases_found %}
                     <div class="font-weight-bold fw-bolder">{{ phrase }}</div>           
@@ -28,7 +28,7 @@
             </div>
         {% else %}
             <div class="alert alert-success" role="alert">
-                <div class="panel-heading">No alerts found.</div>
+                <div class="panel-heading">Няма намерено подозрително съдържание.</div>
             </div>
         {% endif %}
         <!-- Modal -->
@@ -36,12 +36,12 @@
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Please confirm that you want to delete the chat.</h5>
+                    <h5 class="modal-title" id="deleteModalLabel">Моля потвърдете, зе искате да изтриете файла.</h5>
                     </div>
                     <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Затвори</button>
                     <form action="{{ url_for('delete_chat', chat_id=chat.id) }}" method="POST">
-                        <input class="btn btn-danger" type="submit" value="Delete">
+                        <input class="btn btn-danger" type="submit" value="Изтрий">
                     </form>
                     </div>
                 </div>
@@ -49,7 +49,7 @@
         </div>
   {% else %}
     <div class="alert alert-primary" role="alert">
-      <div class="panel-heading">Please log in!</div>
+      <div class="panel-heading">Моля влезте в акаунта си преди да продължите.</div>
     </div>
   {% endif %}
 {% endblock content %}
